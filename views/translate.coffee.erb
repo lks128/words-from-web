@@ -1,0 +1,12 @@
+$("body").highlight "<%= word %>",
+  className: 'translated'
+  wordsOnly: true
+
+elem = $("span").filter ->
+  $(this).text().toLowerCase() == '<%= word %>';
+
+elem.attr("title", '<%= translation %>'); 
+
+$("#translate_form")[0].reset()
+$("#dialog").dialog('close')
+

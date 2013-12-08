@@ -1,0 +1,141 @@
+<html>
+  <head>
+
+    <script type="text/javascript" src="jquery.js">
+	  </script>
+
+    <script type="text/javascript" src="jquery.highlight.js">
+	  </script>
+    
+    <script type="text/javascript" src="jquery.ui.position.js">
+	  </script>
+    
+    <script type="text/javascript" src="jquery-ui.js">
+	  </script>
+    
+    <script type="text/javascript" src="jquery.contextMenu.js">
+	  </script>   
+
+    <script type="text/javascript" src="/javascripts/test.js">
+	  </script> 
+    
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
+    <link href="jquery.contextMenu.css" rel="stylesheet" type="text/css" />
+    <script>
+      $(document).ready(function() {
+        $.get('/words/translated', function(data){
+          var data = JSON.parse(data);
+          var words = [];
+
+          for(var x in data) {
+            words.push(x);
+            
+          }
+
+          $("body").highlight(words, {  className: 'translated', wordsOnly: true }); 
+
+          for(var x in data) {
+            var elem = $("span").filter(function() {
+              return $(this).text().toLowerCase() == x;
+            });
+
+            elem.attr("title", data[x]);
+          }
+        }); // ajax call end
+
+        $("#dialog").hide();
+
+        /*$.contextMenu({
+          selector: '.known', 
+          callback: function(key, options) {
+            if(key == 'forget') {
+              var text = options.$trigger.text();
+              var elem = $("span").filter(function() {
+                return $(this).text().toLowerCase() == text.toLowerCase();
+              });
+              
+              elem.each(function(){
+                $(this).replaceWith($(this).html());
+              });
+
+              $.get('/forget/' + text, function(data) {
+                 eval(data);
+              });
+            }
+          },
+          items: {
+            "forget": {name: "Забыть", icon: "delete"},
+          }
+       });*/
+
+       $.contextMenu({
+          selector: '.unknown', 
+          callback: function(key, options) {
+            var text = options.$trigger.text();
+              if(key == 'remember') {
+                var elem = $("span").filter(function() {
+                  return $(this).text().toLowerCase() == text.toLowerCase();
+                });
+
+                elem.each(function(){
+                  $(this).replaceWith($(this).html());
+                });
+              
+                $.get('/remember/' + text, function(data) {
+                   eval(data);
+                });
+              } else if(key == 'translate') {
+                $("#word").val(text);
+                $("#link").text(text).attr('href','http://www.lingvo-online.ru/ru/Translate/en-ru/'+text);
+                $("#dialog").dialog({position:['middle',20]});
+              }
+          },
+          items: {
+            "remember": {name: "Я знаю это слово", icon: "add"},
+            "translate":{name: "Перевести", icon: "edit"},
+          }
+       });
+
+
+      });
+    </script>
+
+    <style>
+      .known {
+        background: rgba(0,0,0,0.055);
+      }
+   
+      .translated {
+        background: #FFBAD2;
+      }
+
+      .unknown {
+        background: lightblue;
+      }
+    </style>
+
+    <%= $text.text/'head/link' %>
+    <%#= $text.text/'head/script' %>
+  </head>
+
+  <body> 
+    <div id="dialog" title="Basic dialog">
+      <form id="translate_form" method="post" action="/translate" align="left">
+        <a id="link"></a>
+        <p>
+        Word:
+        <input id="word" name="word" type="text" />
+        </p>
+
+        <p>
+        Translation:
+        <textarea id="translation" name="translation" ></textarea>
+        </p>
+
+        <input type="submit" />
+      </form>
+    </div>
+    <%= $text.text/'body' %>
+    <p>hello world!</p><a>the ok?</a>
+  </body>
+</html>
